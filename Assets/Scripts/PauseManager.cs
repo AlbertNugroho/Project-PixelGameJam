@@ -26,10 +26,7 @@ public class PauseManager : MonoBehaviour
     }
     private void Update()
     {
-        if(Input.GetKeyDown(KeyCode.Q))
-        {
-            ExitGame();
-        }
+
     }
     public void PauseGame()
     {
@@ -60,11 +57,11 @@ public class PauseManager : MonoBehaviour
 
     public void ExitGame()
     {
-        StartCoroutine(ExitGameCoroutine());
+        StartCoroutine(ChangeSceneAsync(0));
     }
-    private IEnumerator ExitGameCoroutine()
+    private IEnumerator ChangeSceneAsync(int Id)
     {
-        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(0);
+        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(Id);
 
         Loading.SetActive(true);
 

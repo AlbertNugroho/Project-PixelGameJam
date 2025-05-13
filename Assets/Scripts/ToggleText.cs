@@ -13,8 +13,8 @@ public class ToggleText : MonoBehaviour
     [TextArea]
     public string textString;
 
+    public OpenInv inv;
     public bool playerInTrigger = false;
-
     private void OnEnable()
     {
         interact.action.Enable();   
@@ -47,7 +47,7 @@ public class ToggleText : MonoBehaviour
     {
         if (playerInTrigger && interact.action.WasPressedThisFrame())
         {
-            if (!isreading)
+            if (!isreading && !IsBusy.singleton.isBusy)
             {
                 PauseManager.Instance.movement.rb.linearVelocity = Vector2.zero;
                 PauseManager.Instance.movement.playeranim.SetBool("walking", false);
@@ -55,12 +55,14 @@ public class ToggleText : MonoBehaviour
                 textobj.SetActive(true);
                 text.text = textString;
                 isreading = true;
+                IsBusy.singleton.isBusy = true;
             }
-            else
+            else if (isreading && IsBusy.singleton.isBusy)
             {
                 PauseManager.Instance.ResumeMovement();
                 textobj.SetActive(false);
                 isreading = false;
+                IsBusy.singleton.isBusy = false;
             }
         }
     }

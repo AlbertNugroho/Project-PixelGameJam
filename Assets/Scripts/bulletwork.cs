@@ -7,7 +7,7 @@ public class bulletwork : MonoBehaviour
 {
     // Start is called before the first frame update
     private Rigidbody2D rb;
-    public GameObject blood;
+    public GameObject Spark;
     private float timer = 0;
     void Start()
     {
@@ -24,13 +24,14 @@ public class bulletwork : MonoBehaviour
         }
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Enemy"))
-        {
-            Destroy(gameObject);
-            GameObject bloodEffect = Instantiate(blood, transform.position, Quaternion.identity);
-            Destroy(bloodEffect, 0.2f);
-        }
+        if (other.isTrigger)
+            return;
+        Destroy(gameObject);
+        Debug.Log(other.name);
+        GameObject SparkEffect = Instantiate(Spark, transform.position, Quaternion.identity);
+        Destroy(SparkEffect, 2f);
+
     }
 }

@@ -21,23 +21,14 @@ public class Dash : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        dash.action.performed += OnDash;
-    }
-
-    private void OnEnable()
-    {
-        move.action.Enable();
-        dash.action.Enable();
-    }
-
-    private void OnDisable()
-    {
-        move.action.Disable();
-        dash.action.Disable();
     }
 
     private void Update()
     {
+        if(dash.action.WasPerformedThisFrame())
+        {
+            OnDash();
+        }
         if (dashCooldownTimer > 0f)
             dashCooldownTimer -= Time.deltaTime;
 
@@ -59,7 +50,7 @@ public class Dash : MonoBehaviour
         }
     }
 
-    private void OnDash(InputAction.CallbackContext ctx)
+    private void OnDash()
     {
         if (dashCooldownTimer > 0f || isDashing)
             return;
@@ -70,7 +61,14 @@ public class Dash : MonoBehaviour
             return;
 
         dashDirection = input.normalized;
-        playeranim.SetTrigger("Dash");
+        if (playeranim != null)
+        {
+            playeranim.SetTrigger("Dash");
+        }
+        else
+        {
+            Debug.LogWarning("Animator is missing or destroyed.");
+        }
         isDashing = true;
         dashTimer = dashTime;
         dashCooldownTimer = dashCooldown;

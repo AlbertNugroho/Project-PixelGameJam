@@ -2,10 +2,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class FaceMouse : MonoBehaviour
 {
     SpriteRenderer sr;
+    public GameObject preview;
     void Start()
     {
         sr = GetComponent<SpriteRenderer>();
@@ -32,6 +34,9 @@ public class FaceMouse : MonoBehaviour
 
         Vector3 scale = transform.localScale;
         scale.y = direction.x < 0 ? -Mathf.Abs(scale.y) : Mathf.Abs(scale.y);
+        Vector3 previewscale = preview.transform.localScale;
+        previewscale.y = direction.x < 0 ? -Mathf.Abs(scale.y) : Mathf.Abs(scale.y);
         transform.localScale = scale;
+        preview.transform.localScale = previewscale;
     }
 }
