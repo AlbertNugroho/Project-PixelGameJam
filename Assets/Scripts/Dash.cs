@@ -63,6 +63,7 @@ public class Dash : MonoBehaviour
         dashDirection = input.normalized;
         if (playeranim != null)
         {
+            AudioManager.instance.PlayClip(AudioManager.instance.dashfx);
             playeranim.SetTrigger("Dash");
         }
         else

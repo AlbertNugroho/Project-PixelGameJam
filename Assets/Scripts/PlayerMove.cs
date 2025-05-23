@@ -27,6 +27,7 @@ public class PlayerMove : MonoBehaviour
 
     void Update()
     {
+        
         moveDirection = move.action.ReadValue<Vector2>();
 
         HandleAnimationAndFlip(moveDirection);

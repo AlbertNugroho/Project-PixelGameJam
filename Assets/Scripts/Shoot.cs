@@ -11,10 +11,11 @@ public class Shoot : MonoBehaviour
     public Transform gunpos;
     public float BaseFireRate = 0.5f;
     public float BaseBulletSpeed = 10f;
-    private float spreadAngle;
+    public float spreadAngle;
     public int baseBulletCount = 1;
     private float fireCooldown = 0f;
     public float originalFireRate;
+    public int basedamage = 10;
     public int fireRateUpStacks = 0;
     [Range(0f, 10f)] public float inaccuracy = 1f;
     public CinemachineImpulseSource impulseSource;
@@ -30,14 +31,24 @@ public class Shoot : MonoBehaviour
     }
     private void Start()
     {
+        spreadAngle = baseBulletCount;
         originalFireRate = BaseFireRate;
     }
     void Update()
     {
         if (shoot != null && shoot.action.IsPressed() && fireCooldown <= 0f)
         {
+            if (AmmoWorks.singleton.isReloading)
+                return;
+            if (AmmoWorks.singleton.getcurAmmo() <= 0)
+            {
+                AmmoWorks.singleton.reload();
+                return;
+            }
+            AudioManager.instance.PlayClip(AudioManager.instance.shootfx);
             Fire();
             fireCooldown = BaseFireRate;
+            AmmoWorks.singleton.useAmmo(baseBulletCount);
         }
 
         if (fireCooldown > 0f)
@@ -46,33 +57,40 @@ public class Shoot : MonoBehaviour
 
     public void Fire()
     {
-        spreadAngle = baseBulletCount;
         gun.SetTrigger("Shoot");
         Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Vector2 fireDirection = (mouseWorldPos - gunpos.position).normalized;
 
-        float angleStep = spreadAngle / (baseBulletCount - 1);
-        float startAngle = -spreadAngle / 2;
+        GameObject[] bulletSpawns = GameObject.FindGameObjectsWithTag("BulletSpawnPoint");
+        int spawnCount = bulletSpawns.Length;
+
+        float angleStep = (baseBulletCount > 1) ? spreadAngle / (baseBulletCount - 1) : 0f;
+        float startAngle = -spreadAngle / 2f;
 
         float baseAngle = Mathf.Atan2(fireDirection.y, fireDirection.x) * Mathf.Rad2Deg;
-        float currentInaccuracy = inaccuracy;
 
-        for (int i = 0; i < baseBulletCount; i++)
+        for (int i = 0; i < spawnCount; i++)
         {
-            float angleOffset = (baseBulletCount == 1) ? 0 : startAngle + angleStep * i;
-            float randomSpread = Random.Range(-currentInaccuracy, currentInaccuracy);
-            float angle = baseAngle + angleOffset + randomSpread;
-            Quaternion rotation = Quaternion.Euler(0, 0, angle);
-            Vector3 direction = rotation * Vector3.right;
+            for (int j = 0; j < baseBulletCount; j++)
+            {
+                float angleOffset = (baseBulletCount == 1) ? 0 : startAngle + angleStep * j;
+                float randomSpread = Random.Range(-inaccuracy, inaccuracy);
+                float angle = baseAngle + angleOffset + randomSpread;
 
-            GameObject bullet = Instantiate(bulletPrefab, bulletspawn.position, rotation);
-            Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
-            rb.linearVelocity = direction * BaseBulletSpeed;
+                Quaternion rotation = Quaternion.Euler(0, 0, angle);
+                Vector3 direction = rotation * Vector3.right;
+
+                GameObject bullet = Instantiate(bulletPrefab, bulletSpawns[i].transform.position, rotation);
+                bullet.transform.localScale = Vector2.one * Mathf.Min(basedamage / 10f, 2f);
+                Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
+                rb.linearVelocity = direction * BaseBulletSpeed;
+            }
         }
 
         if (impulseSource != null)
             impulseSource.GenerateImpulse();
     }
+
 
     public void UpdateFireRateFromStacks()
     {

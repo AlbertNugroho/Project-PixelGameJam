@@ -1,12 +1,14 @@
 using System;
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 public class Inventory : MonoBehaviour
 {
     public static Inventory Singleton;
     public static InventoryItem carriedItem;
-    [SerializeField] InventorySlot[] inventorySlots;
+    [SerializeField] public InventorySlot[] inventorySlots;
+    [SerializeField] public InventorySlot[] equipSlots;
     [SerializeField] Transform dragableTransform;
     [SerializeField] InventoryItem itemPrefab;
     public Transform Scope;
@@ -15,7 +17,8 @@ public class Inventory : MonoBehaviour
     public Transform Stock;
     public Transform Grip;
     public Transform Melee;
-    public Transform Throwable;
+    public Transform Weapon;
+    public int ToDelete;
 
     [Header("ItemList")]
     [SerializeField] Item[] Items;
@@ -30,14 +33,9 @@ public class Inventory : MonoBehaviour
         //giveItemBtn.onClick.AddListener(delegate { SpawnInventoryItem(); });
     }
 
-    public void SpawnInventoryItem(Item item = null)
+    public void SpawnInventoryItem(Item item)
     {
         Item _item = item;
-        if (_item == null) ;
-        {
-            int random = UnityEngine.Random.Range(0, Items.Length);
-            _item = Items[random];
-        }
 
         for (int i = 0; i < inventorySlots.Length; i++)
         {
@@ -64,118 +62,80 @@ public class Inventory : MonoBehaviour
 
     public void SetCarriedItem(InventoryItem item)
     {
-        if(carriedItem != null)
+        if (carriedItem != null)
         {
             if (item.activeSlot.myTag != slotTag.None && item.activeSlot.myTag != carriedItem.myItem.itemTag) return;
             item.activeSlot.SetItem(carriedItem);
         }
-        if(item.activeSlot.myTag != slotTag.None)
+        if (item.activeSlot.myTag != slotTag.None)
         {
-            EquipEquipment(item.activeSlot.myTag, null);
+            ToDelete = item.myItem.itemID;
+            EquipEquipment(item.myItem.itemType, null); 
         }
+
         carriedItem = item;
+        item.activeSlot.myItem = null;
         carriedItem.canvasGroup.blocksRaycasts = false;
         item.transform.SetParent(dragableTransform);
     }
 
-    public void EquipEquipment(slotTag tag, InventoryItem item = null)
+
+    public void EquipEquipment(itemTag tag, InventoryItem item = null)
     {
-        switch(tag)
+        Transform parent = null;
+        switch (tag)
         {
-            case slotTag.Scope:
-                if (item == null)
-                {
-                    foreach (Transform child in Scope)
-                    {
-                        Destroy(child.gameObject);
-                    }
-                }
-                else
-                {
-                    StartCoroutine(InstantiateNextFrame(item.myItem.equipmentPrefab, Scope));
-                }
-                break;
-            case slotTag.Magazine:
-                if (item == null)
-                {
-                    foreach (Transform child in Magazine)
-                    {
-                        Destroy(child.gameObject);
-                    }
-                }
-                else
-                {
-                    StartCoroutine(InstantiateNextFrame(item.myItem.equipmentPrefab, Magazine));
-                }
-                break;
-            case slotTag.Stock:
-                if (item == null)
-                {
-                    foreach (Transform child in Stock)
-                    {
-                        Destroy(child.gameObject);
-                    }
-                }
-                else
-                {
-                    StartCoroutine(InstantiateNextFrame(item.myItem.equipmentPrefab, Stock));
-                }
-                break;
-            case slotTag.HandGrip:
-                if (item == null)
-                {
-                    foreach (Transform child in Grip)
-                    {
-                        Destroy(child.gameObject);
-                    }
-                }
-                else
-                {
-                    StartCoroutine(InstantiateNextFrame(item.myItem.equipmentPrefab, Grip));
-                }
-                break;
-            case slotTag.Melee:
-                if (item == null)
-                {
-                    foreach (Transform child in Melee)
-                    {
-                        Destroy(child.gameObject);
-                    }
-                }
-                else
-                {
-                    StartCoroutine(InstantiateNextFrame(item.myItem.equipmentPrefab, Melee));
-                }
-                break;
-            case slotTag.Throwable:
-                if (item == null)
-                {
-                    foreach (Transform child in Throwable)
-                    {
-                        Destroy(child.gameObject);
-                    }
-                }
-                else
-                {
-                    StartCoroutine(InstantiateNextFrame(item.myItem.equipmentPrefab, Throwable));
-                }
-                break;
-            case slotTag.Barrel:
-                if (item == null)
-                {
-                    foreach (Transform child in Barrel)
-                    {
-                        Destroy(child.gameObject);
-                    }
-                }
-                else
-                {
-                    StartCoroutine(InstantiateNextFrame(item.myItem.equipmentPrefab, Barrel));
-                }
-                break;
+            case itemTag.Scope: parent = Scope; break;
+            case itemTag.Magazine: parent = Magazine; break;
+            case itemTag.Stock: parent = Stock; break;
+            case itemTag.Grip: parent = Grip; break;
+            case itemTag.Melee: parent = Melee; break;
+            case itemTag.Barrel: parent = Barrel; break;
         }
 
+        if (parent == null) return;
+
+        if (item == null)
+        {
+            AudioManager.instance.PlayClip(AudioManager.instance.unequip);
+            RemoveItemRecursively(Weapon, ToDelete);
+        }
+        else
+        {
+            AudioManager.instance.PlayClip(AudioManager.instance.equip);
+            StartCoroutine(InstantiateNextFrame(item.myItem.equipmentPrefab, parent));
+        }
     }
+    public bool alreadyEquiped(InventoryItem item)
+    {
+        foreach (var slots in equipSlots)
+        {
+            if (slots.myItem != null && slots.myItem.myItem.itemID == item.myItem.itemID)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void RemoveItemRecursively(Transform parent, int targetID)
+    {
+        foreach (Transform child in parent)
+        {
+            ItemID invItem = child.GetComponent<ItemID>();
+            if (invItem != null && invItem.id == targetID)
+            {
+                Debug.Log($"Destroying item with ID: {invItem.id}");
+                Destroy(child.gameObject);
+                return;
+            }
+            RemoveItemRecursively(child, targetID);
+        }
+
+        Debug.Log("notfound");
+    }
+
+
     IEnumerator InstantiateNextFrame(GameObject prefab, Transform parent)
     {
         yield return null; // Wait one frame

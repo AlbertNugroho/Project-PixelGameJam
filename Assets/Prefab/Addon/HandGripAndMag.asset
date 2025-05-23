@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46d64b148c6ccb64aa2472c8878d60da, type: 3}
+  m_Name: HandGripAndMag
+  m_EditorClassIdentifier: 
+  itemID: 2
+  sprite: {fileID: -4982943066383456974, guid: 358387c78e25cbf44b389912ddb92454, type: 3}
+  itemTag: 1
+  itemType: 5
+  itemName: Bone Mag
+  itemDescription: '+Ammo
+
+    ++Bullet
+
+'
+  addFireRate: 0
+  addBulletSpeed: 0
+  addSpreadAngle: 0
+  addbullet: 2
+  adddamage: 0
+  addaccuracy: 0
+  addmaxammo: 6
+  rotreq: 30
+  bonereq: 80
+  eyereq: 0
+  equipmentPrefab: {fileID: 4061394721999971758, guid: c19a9b6ff4d9d824a829843ccdbcbd7e, type: 3}

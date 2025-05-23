@@ -15,10 +15,6 @@ public class OpenInv : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.L))
-        {
-            Inventory.Singleton.SpawnInventoryItem();
-        }
         if (openInv.action.WasPressedThisFrame())
         {
             if (!invopen && !IsBusy.singleton.isBusy)
@@ -27,6 +23,7 @@ public class OpenInv : MonoBehaviour
                 invPanel.SetActive(true);
                 invopen = true;
                 IsBusy.singleton.isBusy = true;
+                AudioManager.instance.PlayClip(AudioManager.instance.Hover);
             }
             else if (invopen && IsBusy.singleton.isBusy)
             {
@@ -34,6 +31,7 @@ public class OpenInv : MonoBehaviour
                 invPanel.SetActive(false);
                 invopen = false;
                 IsBusy.singleton.isBusy = false;
+                AudioManager.instance.PlayClip(AudioManager.instance.Hover);
             }
         }
     }

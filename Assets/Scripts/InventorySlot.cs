@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -10,6 +11,13 @@ public class InventorySlot : MonoBehaviour, IPointerClickHandler
         if (eventData.button == PointerEventData.InputButton.Left)
         {
             if (Inventory.carriedItem == null) return;
+            if (myTag != slotTag.None)
+            {
+                if (Inventory.Singleton.alreadyEquiped(Inventory.carriedItem))
+                {
+                    return;
+                }
+            }
             if (myTag != slotTag.None && Inventory.carriedItem.myItem.itemTag != myTag) return;
             SetItem(Inventory.carriedItem);
         }
@@ -26,10 +34,10 @@ public class InventorySlot : MonoBehaviour, IPointerClickHandler
         myItem.activeSlot = this;
         myItem.transform.SetParent(transform);
         myItem.canvasGroup.blocksRaycasts = true;
-
-        if(myTag != slotTag.None)
+        
+        if (myTag != slotTag.None)
         {
-            Inventory.Singleton.EquipEquipment(myTag, myItem);
+            Inventory.Singleton.EquipEquipment(myItem.myItem.itemType, myItem);
         }
     }
 

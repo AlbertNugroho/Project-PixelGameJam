@@ -12,8 +12,6 @@ public class ToggleText : MonoBehaviour
     private bool isreading = false;
     [TextArea]
     public string textString;
-
-    public OpenInv inv;
     public bool playerInTrigger = false;
     private void OnEnable()
     {
@@ -49,6 +47,7 @@ public class ToggleText : MonoBehaviour
         {
             if (!isreading && !IsBusy.singleton.isBusy)
             {
+                AudioManager.instance.PlayClip(AudioManager.instance.Hover);
                 PauseManager.Instance.movement.rb.linearVelocity = Vector2.zero;
                 PauseManager.Instance.movement.playeranim.SetBool("walking", false);
                 PauseManager.Instance.PauseMovement();

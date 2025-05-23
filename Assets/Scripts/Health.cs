@@ -4,10 +4,12 @@ using UnityEngine.UI;
 
 public class Health : MonoBehaviour
 {
+    public GameObject deathScreen;
     [SerializeField] private Slider healthBar;
     [SerializeField] private float maxHealth = 10f;
     public TextMeshProUGUI healthText;
     private float currentHealth;
+    public bool isImmune;
     private void Awake()
     {
     }
@@ -19,11 +21,24 @@ public class Health : MonoBehaviour
         UpdateHealth();
     }
 
-    public void TakeDamage(float amount = 1f)
+    public void TakeDamage(int amount)
     {
+        AudioManager.instance.PlayClip(AudioManager.instance.Damagedfx);
         currentHealth -= amount;
         healthBar.value = currentHealth;
         CheckLoseCondition();
+        UpdateHealth();
+        isImmune = true;
+        Invoke("disableImune", 1f);
+    }
+    void disableImune()
+    {
+        isImmune = false;
+    }
+    public void FullHeal()
+    {
+        currentHealth = maxHealth;
+        healthBar.value = currentHealth;
         UpdateHealth();
     }
 
@@ -31,8 +46,11 @@ public class Health : MonoBehaviour
     {
         if (currentHealth <= 0)
         {
-            Time.timeScale = 0;
-            Debug.Log("Player Dead");
+            AudioManager.instance.PlayClip(AudioManager.instance.deathfx);
+            AudioManager.instance.PlayMusic(AudioManager.BgAudio.Death);
+            PauseManager.Instance.PauseMovement();
+            deathScreen.SetActive(true);
+            IsBusy.singleton.isBusy = true;
         }
     }
     private void UpdateHealth()

@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46d64b148c6ccb64aa2472c8878d60da, type: 3}
+  m_Name: ZombieArm
+  m_EditorClassIdentifier: 
+  itemID: 6
+  sprite: {fileID: -4587851572509288126, guid: c793d3ca37145f64da1e58d86a8f2b5b, type: 3}
+  itemTag: 1
+  itemType: 6
+  itemName: Zombie Arm
+  itemDescription: Adds An Arm To Attack Your Enemies
+  addFireRate: 0
+  addBulletSpeed: 0
+  addSpreadAngle: 0
+  addbullet: 0
+  adddamage: 0
+  addaccuracy: 0
+  addmaxammo: 0
+  rotreq: 50
+  bonereq: 30
+  eyereq: 0
+  equipmentPrefab: {fileID: 7445268498372191020, guid: dd9bdde41acf8ca48982302711745a8b, type: 3}
