@@ -2,7 +2,7 @@
 <div align="center">
   <a href="https://skyalert.itch.io/necrodemios">
 
-**Play Now**
+## Play Now
 </a>
 </div>
 
